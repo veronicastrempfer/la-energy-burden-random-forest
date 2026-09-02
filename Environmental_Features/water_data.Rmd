@@ -1,0 +1,132 @@
+---
+title: "water_data"
+author: "Veronica Strempfer"
+date: "2026-04-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# California Lakes
+library(readr)
+lakes <- read.csv("California_Lakes.csv")
+```
+
+```{r}
+# added city column
+# remove NA values (no city associated with it)
+# some lakes aren't associated with specific city lines so were marked as NA
+library(sf)
+library(tigris)
+library(dplyr)
+
+lakes_clean <- lakes %>%
+  filter(!is.na(LAT_NAD83) & !is.na(LON_NAD83))
+
+# converting to spatial points
+lakes_sf <- st_as_sf(lakes_clean,
+                     coords = c("LON_NAD83", "LAT_NAD83"),
+                     crs = 4326)
+ca_counties <- counties(state = "CA", cb = TRUE)
+la_county <- ca_counties[ca_counties$NAME == "Los Angeles", ]
+la_county <- st_transform(la_county, crs = st_crs(lakes_sf)) # both datasets using same coordinates before filtering
+
+# only lakes in LA county
+lakes_la <- st_filter(lakes_sf, la_county)
+la_cities <- places(state = "CA", cb = TRUE)
+la_cities <- st_transform(la_cities, st_crs(lakes_sf))
+la_cities_la <- st_filter(la_cities, la_county)
+lakes_with_city <- st_join(lakes_la, la_cities_la["NAME"])
+lakes_with_city_df <- st_drop_geometry(lakes_with_city)
+lakes_with_city_df
+```
+
+
+```{r}
+lakes_city_clean <- lakes_with_city %>%
+  st_drop_geometry() %>%
+  filter(!is.na(NAME.y))
+lakes_city_clean 
+```
+
+
+```{r}
+library(stringr)
+# make sure to normalize city names for join
+water_cities <- lakes_city_clean %>% 
+  distinct(NAME.y) %>%
+  rename(City_Name = NAME.y) %>%
+  mutate(
+    City_Name = toupper(str_squish(City_Name)),
+    lakeTF = 1
+  )
+
+water_cities
+```
+
+
+
+
+
+
+```{r}
+library(sf)
+library(dplyr)
+lakes_and_reservoirs <- st_read("nhd_major_lakes_and_reservoirs.gpkg")
+```
+
+```{r}
+library(sf)
+library(tigris)
+library(dplyr)
+
+ca_counties_all <- counties(state = "CA", cb = TRUE)
+la_boundary <- ca_counties_all %>%
+  filter(NAME == "Los Angeles")
+lakes_and_reservoirs <- st_transform(lakes_and_reservoirs, crs = st_crs(la_boundary)) 
+
+# only lakes/reservoirs in LA county
+lakes_la_filtered <- st_filter(lakes_and_reservoirs, la_boundary)
+
+lakes_la_table <- st_drop_geometry(lakes_la_filtered)
+
+nrow(lakes_and_reservoirs)
+nrow(lakes_la_table)
+head(lakes_la_table)
+```
+
+
+
+
+
+
+```{r}
+library(sf)
+major_rivers <- st_read("nhd_major_rivers_and_creeks.gpkg")
+```
+
+```{r}
+library(sf)
+library(tigris)
+library(dplyr)
+
+ca_counties_all <- counties(state = "CA", cb = TRUE)
+la_boundary <- ca_counties_all %>%
+  filter(NAME == "Los Angeles")
+major_rivers <- st_transform(major_rivers, crs = st_crs(la_boundary)) 
+
+# only lakes/reservoirs in LA county
+rivers_la_filtered <- st_filter(major_rivers, la_boundary)
+
+rivers_la_table <- st_drop_geometry(rivers_la_filtered)
+
+nrow(major_rivers)
+nrow(rivers_la_table)
+head(rivers_la_table)
+```
+
+
