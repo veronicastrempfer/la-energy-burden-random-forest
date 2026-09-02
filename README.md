@@ -14,6 +14,7 @@ Used R studio for whole process. Went through data processing of removing NA val
   - Number of features randomly sampled as candidates at each split was = 2 & 3 
   - Node size was varied between  = 10 & 25 (default 1)
 ## Results
+- Poor model performance, Out of Bag (OOB) error rate = 65% (Predictors had weak classification accuracy)
 - Environmental features (tree, parks, water, acreage matter BUT not strong predictors on their own)
 - Energy burden may depend on factors beyond those included in this analysis, such as building characteristics and other demographics
 - Environmental effects (shade, temperature) help but are still limited
