@@ -1,0 +1,69 @@
+---
+title: "tree_data"
+author: "Veronica Strempfer"
+date: "2026-04-08"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(dplyr)
+tree_raw <- read_csv("Public_Works_Road_Maintenance_Division_Tree_Inventory_(Public_View)_2479203802696342889.csv")
+
+unique(tree_raw$COMMUNITY)
+```
+
+
+
+```{r}
+library(dplyr)
+library(stringr)
+# filter by city (ie Arcadia) create into data frame and sum over that way
+# cities from joined data included here: Arcadia, Azusa, Cerritos, Claremont, Covina, Duarte, Glendora, Hawthorne, La Habra Heights, La Verne, Lakewood, Lancaster, Long Beach, Los Angeles, Monrovia, Palmdale, Pomona, San Dimas, Santa Clarita, Sierra Madre, South El Monte, Walnut, Whittier
+
+tree_clean <- tree_raw %>%
+  filter(!is.na(COMMUNITY)) %>%
+  mutate(
+    COMMUNITY = toupper(str_squish(COMMUNITY))
+  )
+tree_clean %>%
+  count(COMMUNITY, sort = TRUE)
+tree_city_totals <- tree_clean %>%
+  group_by(COMMUNITY) %>%
+  mutate(total_trees_city = n()) %>%
+  ungroup()
+tree_city_totals
+```
+
+```{r}
+library(janitor)
+tree_summary <- tree_clean %>%
+  group_by(COMMUNITY) %>%
+  summarise(trees = n(), .groups = "drop")
+tree_summary
+
+tree_clean %>% tabyl(COMMUNITY)
+```
+
+
+
+
+
+```{r}
+
+tree_summary_2 <- tree_summary %>%
+  rename(
+  City_Name = COMMUNITY
+) %>%
+  select(City_Name, trees)
+tree_summary_2
+
+```
+
+
+
+
