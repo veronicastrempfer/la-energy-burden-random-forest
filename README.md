@@ -6,6 +6,7 @@ Does the inclusion of environmental features (ie. greenspace and water body pres
  
 ## Data
 [data-files](https://drive.google.com/drive/folders/1zcG0U6XXmwUR7Oj5FS8gKgybJKuImVVW?usp=sharing)
+
 For this project a combination of city related data including city names, FIPs, and zip codes were used to identify specific cities in LA. Environmental features were captured using lake presence in different cities of California. Tree data was used to capture the number of trees per city. For greenspace park access was recorded by looking at the number of parks in that city as well as the average acreage of these parks.
 
 ## Methods
