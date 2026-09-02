@@ -1,2 +1,4 @@
 # la-energy-burden-random-forest
-A data science project analyzing energy burden levels across cities in Los Angeles County using Random Forest modeling.
+## Research Question: 
+Does the inclusion of environmental features (ie. greenspace and water body presence) improve the classification of energy burden levels of residents’ across different LA County cities? 
+
